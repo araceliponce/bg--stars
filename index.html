@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>p5js</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js" integrity="sha512-3RlxD1bW34eFKPwj9gUXEWtdSMC59QqIqHnD8O/NoTwSJhgxRizdcFVQhUMFyTp5RwLTDL0Lbcqtl8b7bFAzog==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      line-height: 1.8;
+      font-size: 200%;
+      color: white;
+    }
+
+    canvas {
+      width: 100vw;
+      height: 100vh;
+
+      position: fixed;
+      /* fixed para que salga del flow del documento*/
+    }
+
+    canvas {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+    }
+
+    .content {
+      margin-inline: auto;
+      max-width: 30ch;
+      opacity: 0;
+    }
+
+
+    p {
+      white-space: pre-line;
+      /* By default, HTML collapses consecutive whitespace characters, including line breaks, into a single space. If you want to retain line breaks inside <p> elements, you can use the CSS property white-space: pre-line; */
+    }
+  </style>
+</head>
+
+<body>
+
+
+  <main>
+
+    <div id="abc">
+    </div>
+    <div class="content">
+
+      <p>
+        Lorem ipsum dolor sit amet,
+        consectetur adipiscing elit.
+        Sed do eiusmod tempor incididunt
+        ut labore et dolore magna aliqua.
+      </p>
+      <p>
+        Ut enim ad minim veniam,
+        quis nostrud exercitation ullamco
+        laboris nisi ut aliquip ex ea commodo consequat.
+      </p>
+      <p>
+        Duis aute irure dolor in reprehenderit
+        in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+      </p>
+      <p>
+        Excepteur sint occaecat cupidatat non proident,
+        sunt in culpa qui officia deserunt mollit anim id est laborum.
+      </p>
+    </div>
+
+
+
+  </main>
+
+
+
+  <script>
+
+    const dotSize = 3;
+    let dots = [];
+
+    const spacing = dotSize * 7;
+
+    const minOpacity = 40;
+
+    const areaOfEffect = 34;
+
+    const element = document.getElementById('abc');
+
+
+
+
+    function setup() {
+      // createCanvas(windowWidth, windowHeight);   si el html esta vacío, automaticamente se crea un elemento main
+
+      // manageResizing();
+      createCanvas(screen.width, screen.height);
+
+
+      /* for (let i = 0; i < width; i += spacing) {
+        for (let j = 0; j < height; j += spacing) {
+          let dot = new Dot(i + spacing / 2, j + spacing / 2, dotSize);
+          dots.push(dot); //push el dot dentro del arrat de dots para que luego foreach se renderizen
+        }
+      } */
+
+      //ahora hay mas puntos que no pueden verse, pero me evita tener que crearlos una y otra vez en cada resize:
+      for (let i = 0; i < screen.width; i += spacing) {
+        for (let j = 0; j < screen.height; j += spacing) {
+          let dot = new Dot(i + spacing / 2, j + spacing / 2, dotSize);
+          dots.push(dot); //push el dot dentro del arrat de dots para que luego foreach se renderizen
+        }
+      }
+    }
+
+
+
+    function draw() {
+      background(0)
+
+      // cada Dot luego es renderizado con su metodo
+      dots.forEach(dot => {
+        // let d = new Dot(10, 10, dotSize) //ahora esta dentro del loop doble en setup()
+        dot.update() //importante
+        dot.render();
+      })
+    }
+
+    //si el mouse esta quieto, quita la opacidad ganada
+    //tiene que llamarse mouseMoved, aunque quieras llamarlo mouseMoving
+    let isMouseMoved = false;
+
+    function mouseMoved() {
+      isMouseMoved = true;
+      setTimeout(() => {
+        isMouseMoved = false;
+      }, 500);
+    }
+
+
+
+
+    //dot va a tener métodos :D
+    class Dot {
+      constructor(x, y, size) {
+        this.x = x;
+        this.y = y;
+        this.size = size;
+        this.opacity = minOpacity; // 10 es mas transparente, 255 es sólido
+      }
+
+
+      update() {
+
+        //si las coordenadas del mouse estan cerca a las coordenadas del punto, gana opacidad
+        let distance = dist(mouseX, mouseY, this.x, this.y)
+
+
+        if (isMouseMoved && distance < areaOfEffect) {
+          this.opacity = 222; //255 es el máximo
+          this.size = dotSize + 1.5; // pude haber llamado dotSize minDotSize pero no lo hice
+        } else {
+          this.opacity = max(minOpacity, this.opacity - 10) //max(a,b) utiliza el valor que sea mayor
+
+          this.size = dotSize;
+        }
+      }
+
+
+      render() {
+        // fill(255, this.opacity)
+        fill(255, this.opacity)
+        ellipse(this.x, this.y, this.size)
+      }
+
+    }
+
+
+
+
+    // window.addEventListener('resize', () => {
+    //   //   manageResizing();
+    //   createCanvas(window.width, window.height);
+
+    // })
+
+
+
+
+  </script>
+</body>
+
+</html>
